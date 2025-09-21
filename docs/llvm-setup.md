@@ -122,6 +122,7 @@ This yields `clang`, `lld`, `mlir-opt`, `mlir-translate`, `llc`, etc., with CPU 
 | ML/AI on CPU | `X86` |
 | ML/AI on NVIDIA GPU | `X86;NVPTX` |
 | ML/AI on AMD GPU | `X86;AMDGPU` |
+| NVIDIA Jetson CPU (for cross-compiling host code later). | `AArch64` |
 
 Start with `X86` only to keep builds fast; add GPU backends when you actively need them.
 

@@ -48,7 +48,7 @@ Set up the toolchain once on WSL2/Ubuntu to cover C/C++, LLVM, and MLIR experime
     ./shared/samples/toolchain-check/build/hello
     ```
 - **Optional: build LLVM/MLIR from source** – Needed when experimenting with custom MLIR dialects:
-  - Install extras: `sudo apt install -y python3-venv zlib1g-dev libedit-dev libxml2-dev`
+  - Install extras: `sudo apt install -y python3-venv zlib1g-dev libedit-dev libxml2-dev ccache`
     - `python3-venv` — Isolated environments for MLIR Python tooling.
     - `zlib1g-dev` — Compression dependency required by LLVM.
     - `libedit-dev` — Line-editing library used by LLVM shell tools.
@@ -60,7 +60,8 @@ Set up the toolchain once on WSL2/Ubuntu to cover C/C++, LLVM, and MLIR experime
       mkdir build && cd build
       cmake -G Ninja ../llvm \
         -DLLVM_ENABLE_PROJECTS="clang;lld;mlir" \
-        -DLLVM_TARGETS_TO_BUILD="X86;NVPTX;AMDGPU" \
+        -DLLVM_TARGETS_TO_BUILD="X86;NVPTX" \
+        -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
         -DCMAKE_BUILD_TYPE=Release \
         -DLLVM_ENABLE_ASSERTIONS=ON
       ninja
