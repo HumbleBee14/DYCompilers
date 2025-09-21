@@ -70,6 +70,8 @@ Set up the toolchain once on WSL2/Ubuntu to cover C/C++, LLVM, and MLIR experime
 
 Revisit `shared/tools/tooling-checklist.md` as you add linters, formatters, or extra dependencies.
 
+> **Need faster LLVM/MLIR setup or submodule instructions?** See `docs/llvm-setup.md` for minimal builds, pinned submodules, and prebuilt archive options.
+
 Prefer keeping LLVM/MLIR inside this repository (rather than a one-off clone)? Use the submodule workflow below.
 
 ## LLVM/MLIR Submodule Workflow (release/19.x)
@@ -86,7 +88,7 @@ Prefer keeping LLVM/MLIR inside this repository (rather than a one-off clone)? U
       -B external/llvm-project/build \
       -G Ninja \
       -DLLVM_ENABLE_PROJECTS="clang;lld;mlir" \
-      -DLLVM_TARGETS_TO_BUILD="X86;NVPTX;AMDGPU" \
+      -DLLVM_TARGETS_TO_BUILD="X86;" \
       -DCMAKE_BUILD_TYPE=Release \
       -DLLVM_ENABLE_ASSERTIONS=ON \
       -DCMAKE_INSTALL_PREFIX="${PWD}/external/llvm-project/build/install"
@@ -427,6 +429,73 @@ NOTE: LLVM/MLIR are *everywhere* in compilers (classical and ML).
 
 =============================================================
 
+---
+
+# 📌 Tools You’ll Use Day-to-Day
+
+* **`clang` / `clang++`** → C/C++ frontend (useful for testing how C++ lowers to LLVM IR).
+* **`opt`** → run LLVM optimization passes on `.ll` IR.
+* **`llc`** → lower LLVM IR → assembly for a target (x86, ARM, etc.).
+* **`lli`** → run LLVM IR directly (interpreter).
+* **`mlir-opt`** → run MLIR passes on dialects (e.g., `linalg`, `scf`, `torch`).
+* **`mlir-translate`** → convert MLIR ↔ LLVM IR.
+* **`lld`** → linker, combines objects into executables.
+
+👉 For **toy compilers**: focus on `opt`, `llc`, `lli`.
+👉 For **ML/AI compilers**: add `mlir-opt`, `mlir-translate`.
+
+---
+
+# 📌 Core Concepts
+
+### 1. Is MLIR part of LLVM?
+
+Yes. MLIR started separately but is now inside LLVM (as `mlir/` folder). It’s a framework to define multiple IRs (dialects), then lower to LLVM IR.
+
+### 2. Backends
+
+* Backends = machine-specific code generators inside LLVM.
+* Examples: `x86` (Intel/AMD CPUs), `ARM/AArch64` (Apple, mobile), `NVPTX` (NVIDIA GPUs), `AMDGPU` (AMD GPUs), `WebAssembly` (browsers).
+* One LLVM build gives you all of these.
+* Compiler devs write frontends + IR passes, then reuse these backends to get machine code.
+
+### 3. Frontends
+
+* Language-specific compilers:
+
+  * **Clang** (C/C++) → LLVM backend.
+  * **Rustc** (Rust) → LLVM backend.
+  * **Swiftc** (Swift) → LLVM backend.
+  * **Javac** (Java) → targets JVM bytecode (not LLVM).
+* Pattern: frontend is custom per language, but many share LLVM’s middle/backends.
+
+### 4. MLIR Dialects
+
+* A **dialect** = a set of operations and types defined for a specific domain.
+* Examples:
+
+  * **`linalg`** → linear algebra ops (`matmul`, `conv2d`).
+  * **`scf`** → structured control flow (`for`, `while`).
+  * **`gpu`** → GPU kernel launch ops.
+  * **`torch`** → PyTorch ops.
+  * **`mhlo`** → TensorFlow/XLA ops.
+* Dialects keep high-level meaning (e.g., “matrix multiply”) before lowering to low-level LLVM IR.
+
+---
+
+# 📌 Mental Model
+
+* **Frontend** = parse + AST + type-check (language-specific).
+* **Middle-end** = optimizations + transformations (LLVM IR or MLIR dialects).
+* **Backend** = machine-specific codegen (provided by LLVM).
+* **General-purpose languages** (C++, Rust): often skip MLIR → go directly to LLVM IR.
+* **Domain-specific languages** (ML, quantum, GPU): benefit from MLIR dialects → then lower to LLVM IR.
+
+---
+
+
+
+============================================================
 
 ## Contributing Projects
 - Place each new compiler under the phase that matches its scope and create a fresh folder using the template.
