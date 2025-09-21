@@ -30,3 +30,35 @@
 *.exe
 *.out
 *.app
+
+# CMake & Ninja build outputs
+build/
+**/build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+Testing/
+*.ninja
+.ninja_deps
+.ninja_log
+
+# General build artifacts
+*.log
+*.cache
+
+# Python caches & virtualenvs
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+venv/
+.venv/
+env/
+.env/
+
+# IDE & tooling noise
+.idea/
+.vscode/
+*.code-workspace
+.DS_Store
