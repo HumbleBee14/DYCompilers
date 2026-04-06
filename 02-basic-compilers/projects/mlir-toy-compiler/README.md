@@ -74,3 +74,48 @@ Toy source --> Lexer --> Parser --> AST
 - LLVM/MLIR built from source (see [LLVM setup](../../../README.md#llvmmlir-submodule-workflow-release19x))
 - C++17 compiler (clang++ recommended)
 - CMake + Ninja
+
+## Build Environment (verified April 2026, WSL2 Ubuntu)
+
+### Core Toolchain
+
+| Tool | Version | Status |
+|------|---------|--------|
+| clang / clang++ | 18.1.3 (Ubuntu) | installed |
+| gcc / g++ | 11.5.0 / 13.3.0 | installed |
+| cmake | 3.28.3 | installed |
+| ninja | 1.11.1 | installed |
+| git | 2.43.0 | installed |
+| python3 | 3.12.3 | installed |
+| ccache | 4.9.1 | installed |
+
+### Parsing Tools
+
+| Tool | Version | Status |
+|------|---------|--------|
+| flex | 2.6.4 | installed |
+| bison | 3.8.2 | installed |
+
+### LLVM/MLIR Dev Libraries
+
+| Package | Version | Status |
+|---------|---------|--------|
+| llvm-dev | 18.0 | installed |
+| libclang-dev | 18.0 | installed |
+| zlib1g-dev | 1.3 | installed |
+| libedit-dev | 3.1 | installed |
+| libxml2-dev | 2.9.14 | installed |
+| lld | — | not installed (optional) |
+| lldb | — | not installed (optional) |
+
+### LLVM/MLIR Source Build
+
+| Item | Details |
+|------|---------|
+| Submodule path | `external/llvm-project/` |
+| Pinned tag | `llvmorg-19.1.0` |
+| Build type | Release, assertions ON |
+| Targets | X86 |
+| Enabled projects | clang, lld, mlir |
+| LLVMConfig.cmake | `external/llvm-project/build/install/lib/cmake/llvm/` |
+| MLIRConfig.cmake | `external/llvm-project/build/install/lib/cmake/mlir/` |
