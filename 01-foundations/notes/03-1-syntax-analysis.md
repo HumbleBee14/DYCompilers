@@ -2,6 +2,14 @@
 
 Goal: take the token stream from the lexer and check whether it forms a valid sentence in the language grammar; build a tree structure (parse tree/AST) that captures the program’s structure.
 
+## Role of the parser (big picture)
+
+![Syntax analyzer context](src/syntax_analyzer.jpg)
+
+- Input: token stream from the lexer.
+- Knowledge: a grammar that defines valid sentence shapes.
+- Output: a tree (parse tree first, then AST) or a clear syntax error.
+
 ## Core vocabulary (quick and friendly)
 - Grammar G = (T, N, P, S)
   - `T` terminals: token kinds from the lexer (e.g., IDENT, PLUS, INT).
@@ -11,10 +19,40 @@ Goal: take the token stream from the lexer and check whether it forms a valid se
 - Parse tree: shows every rule application; great for proofs, noisy for compilers.
 - AST (abstract syntax tree): drops punctuation and derives operator nodes; what compilers actually use.
 
+Context‑free grammar (CFG) in plain English
+- “Context‑free” means a rule’s left‑hand side is a single nonterminal and the rule does not depend on what’s around it.
+- Terminals are the leaves you already know: actual token kinds (IF, WHILE, IDENT, INT, `+`, `(`, …).
+- Nonterminals are buckets like `Expr`, `Stmt`, `Block` that expand via rules into terminals/nonterminals.
+- Productions are the recipes; the start symbol is the top‑level recipe (e.g., `Program`).
+
+Why CFGs for programming languages?
+- Capture hierarchy naturally (program → function → statement → expression).
+- Make parsers systematic and maintainable; we can change rules without rewriting the whole parser.
+
+### The four parts of a CFG (plain English)
+A CFG = (Terminals, Nonterminals, Productions, StartSymbol)
+
+1) Terminals — the tokens from the lexer (actual words/symbols)
+   - Examples: `IF`, `WHILE`, `IDENT`, `INT`, `+`, `*`, `=`, `(`, `)`, `{`, `}`, `;`
+2) Nonterminals — syntactic variables (names for phrases the parser builds)
+   - Examples: `Expr`, `Term`, `Factor`, `Stmt`, `StmtList`, `Program`
+3) Productions (rules) — how to expand a nonterminal into smaller parts
+   - Example: `Expr → Expr + Term | Term`
+4) Start symbol — the top‑level thing to build
+   - Often `Program`
+
+Analogy to English
+- Terminals = words ("if", "while", ";")
+- Nonterminals = parts of speech/phrases (Sentence, NounPhrase)
+- Productions = grammar rules (Sentence → NounPhrase VerbPhrase)
+- Start = Sentence
+
 ## From tokens to trees (high‑level flow)
 ```
 Tokens → [Parser] → Parse Tree → [AST builder/simplifier] → AST
 ```
+
+See also: `03-2-syntax-analysis.md` for a friendlier deep‑dive on E/T/F, derivations (left‑most vs right‑most), removing left recursion, and left factoring — all with step‑by‑step examples and analogies.
 
 ## Expression grammar starter (precedence/associativity encoded)
 ```
@@ -31,8 +69,70 @@ Example parse (tokens for `a + b * 60`)
        /   \
     (id a)  (*)
            /   \
-       (id b) (60)
+        (id b) (60)
 ```
+
+## Concrete AST examples (operators + leaves)
+
+Simple program
+```c
+function main() {
+  if (x < 10) {
+    y = y + 1;
+  }
+  while (y < 100) {
+    y = y * 2;
+  }
+}
+```
+
+AST structure to look for
+- Root: Program
+  - Function(main)
+    - IfNode: condition `< x 10`; then → Assign `y = y + 1`
+    - WhileNode: condition `< y 100`; body → Assign `y = y * 2`
+
+Diagram
+![AST for simple program](src/AST-with-simple-program.png)
+
+Tiny arithmetic/if example (operators as internal nodes, identifiers/literals as leaves)
+
+```c
+function main() {
+  let a = 2 + 3 * 4;
+  if (a - 5 > 0) { a = a - 1; }
+}
+```
+
+Diagram
+![AST operators and leaves](src/AST-with-operators-and-leaf-operands.png)
+
+What to notice
+- `Binary(+)` has children `Num(2)` and `Binary(*)`; `Binary(*)` has `Num(3)` and `Num(4)`.
+- `if` condition is `Binary(>)` whose left is `Binary(-)` (Var(a), Num(5)) and right is `Num(0)`.
+- Leaves are numbers/variables; internal nodes are operators/statements.
+
+Minimal AST node sketch (language‑agnostic pseudocode)
+```cpp
+// Base
+struct Node { virtual ~Node() {} };
+
+// Expressions
+struct Number : Node { int value; };
+struct Var    : Node { string name; };
+struct Binary : Node { string op; Node* left; Node* right; }; // op in {+,-,*,/,<,>,==,...}
+
+// Statements
+struct Assign    : Node { Var* lhs; Node* rhs; };
+struct IfNode    : Node { Node* condition; vector<Node*> then_block; vector<Node*> else_block; };
+struct WhileNode : Node { Node* condition; vector<Node*> body; };
+struct FuncDef   : Node { string name; vector<Node*> body; };
+struct Program   : Node { vector<FuncDef*> functions; };
+```
+
+Why parentheses and keywords look “dropped” in ASTs
+- Parentheses are just for grouping; once precedence is encoded by the tree, extra `()` are unnecessary and omitted.
+- Keywords are not stored as raw strings; they determine the node type (e.g., token `while` → AST kind `WhileNode`).
 
 ## Common grammar issues and fixes
 - Ambiguity: a string has more than one parse tree.
@@ -113,6 +213,8 @@ Node* parseFactor() {
 - [ ] Capture at least one error‑recovery synchronising set for your toy language.
 
 ## FAQ
+- What are terminals vs nonterminals in real terms?
+  - Terminals are token kinds from the lexer (`IDENT`, `INT`, `PLUS`, `IF`). Nonterminals are grammar categories like `Expr`, `Stmt`, `Block` that expand into terminals/nonterminals.
 - Is AST the same as a parse tree?
   - No. Parse trees show every grammar symbol; ASTs drop punctuation and compress chains. ASTs are the compact representation compilers transform.
 - Why remove left recursion only for LL parsers?
@@ -121,3 +223,5 @@ Node* parseFactor() {
   - Either use precedence/associativity declarations in a parser generator or use Pratt/precedence‑climbing parsing in a hand‑written parser.
 - Do I need FIRST/FOLLOW if I’m hand‑writing a recursive‑descent parser?
   - They’re still useful to reason about predictability and to design good error messages, even if you don’t compute full tables.
+- Why does the AST “drop” parentheses and keywords?
+  - Parentheses: tree structure already captures grouping. Keywords: encoded as node kinds (`IfNode`, `WhileNode`) rather than stored as strings.

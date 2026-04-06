@@ -56,9 +56,14 @@ venv/
 .venv/
 env/
 .env/
+*.egg-info/
+
+# LLVM artifacts
+*.bc
 
 # IDE & tooling noise
 .idea/
 .vscode/
 *.code-workspace
 .DS_Store
+/external
