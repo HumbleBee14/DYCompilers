@@ -89,3 +89,4 @@ For a deep dive, the [Toy Tutorial](https://mlir.llvm.org/docs/Tutorials/Toy/) f
 - [Building Compiler with Flex, Bison, LLVM, and MLIR (YouTube)](https://www.youtube.com/playlist?list=PLxP0p--aBHmL5uj9eecRFLIm1Qx2T8_sx)
 - [LLVM IR Introduction (CompilerSutra)](https://www.compilersutra.com/docs/llvm/llvm_ir/intro_to_llvm_ir/)
 - [Practical Guide for Building a Compiler (Reddit)](https://www.reddit.com/r/Compilers/comments/1edl044/a_practical_guide_for_building_a_compiler_with/)
+- [Language Frontend with LLVM Tutorial] (https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/index.html)
