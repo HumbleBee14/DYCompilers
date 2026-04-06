@@ -67,3 +67,7 @@ env/
 *.code-workspace
 .DS_Store
 /external
+
+# AI assistant & personal configs
+.github/copilot-instructions.md
+CLAUDE.md
