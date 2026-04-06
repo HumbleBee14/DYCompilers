@@ -71,3 +71,4 @@ env/
 # AI assistant & personal configs
 .github/copilot-instructions.md
 CLAUDE.md
+/external
