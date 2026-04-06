@@ -1,26 +1,21 @@
-﻿# Phase 02 — Basic Compilers
+# Phase 02 — Basic Compilers
 
-Focus: ship an end-to-end compiler for a small language. Emphasis on parsing, AST building, semantic checks, and bytecode/runtime design.
+Focus: build an end-to-end compiler by following the [MLIR Toy Tutorial](https://mlir.llvm.org/docs/Tutorials/Toy/). Learn every compiler concept hands-on — from lexing to JIT execution — in one continuous project.
 
-## Objectives
-- Implement full lexical + syntactic analysis for expression-oriented languages.
-- Build semantic analysis: symbol tables, scope rules, type checking basics.
-- Emit bytecode or direct evaluation structures; create a simple VM or interpreter.
-- Establish testing discipline (unit + integration) and CI-ready scripts.
+## Core Project — MLIR Toy Compiler
 
-## Core Project — Tiny Arithmetic Compiler
-Target: compile a small arithmetic language with variables and functions to a stack-machine bytecode.
+Work through all 7 chapters of the official MLIR Toy tutorial, building a compiler for a tensor-based language. Each chapter teaches a core compiler concept and maps to a foundation note.
 
-Suggested pipeline:
-1. Lexer + Pratt parser for precedence climbing.
-2. AST validation, constant folding, and symbol resolution.
-3. Bytecode generation and stack-machine runtime implementation.
-4. CLI driver with REPL and file compilation modes.
-5. Unit + regression suites plus benchmarks.
+See the full guide and progress tracker: [mlir-toy-compiler/README.md](projects/mlir-toy-compiler/README.md)
 
-## Additional Experiments
-- Try recursive descent vs parser generator approaches.
-- Explore error reporting UX (highlight spans, suggestions).
-- Add intermediate representation dumps to inspect pipeline stages.
+## What You'll Learn (by chapter)
+
+1. **Lexer + Parser + AST** — tokenization, recursive descent, tree construction
+2. **IR Generation** — SSA form, MLIR dialects, TableGen/ODS
+3. **Optimization** — pattern rewriting, canonicalization, dead code elimination
+4. **Semantic Analysis** — inlining, type/shape inference, operation interfaces
+5. **IR Lowering** — progressive lowering, tensor→buffer, Affine dialect
+6. **Code Generation** — LLVM backend, full lowering, JIT compilation
+7. **Type Systems** — custom types, struct support, DSL extensibility
 
 Progress to Phase 03 once you can extend this compiler confidently.
